@@ -1,38 +1,39 @@
-# 📱 Vulnerabilidad Crítica: Permisos Excesivos y Riesgo de Grabación de Audio No Autorizada en la App de Criptomonedas `com.cryptology.flutter`
+📱 Critical Vulnerability: Excessive Permissions and Unauthorized Audio Recording Risk in the Cryptocurrency App com.cryptology.flutter
+🔐 Vulnerability Description
 
-## 🔐 Descripción de la Vulnerabilidad
+Multiple critical vulnerabilities have been identified in the mobile application com.cryptology.flutter, a cryptocurrency app available for Android. These issues pose a serious risk to user privacy and security, primarily due to:
 
-Se han identificado múltiples **vulnerabilidades críticas** en la aplicación móvil `com.cryptology.flutter`, una app de criptomonedas disponible para Android. Estas vulnerabilidades representan un riesgo grave para la **privacidad** y **seguridad de los usuarios**, principalmente debido a:
+    Unjustified request of excessive permissions.
 
-- Solicitud excesiva de permisos no justificados.
-- Acceso continuo al micrófono mediante el permiso `FOREGROUNDSERVICEMICROPHONE`.
-- Acceso al micrófono en tiempo de ejecución sin consentimiento explícito del usuario.
+    Continuous access to the microphone through the FOREGROUNDSERVICE_MICROPHONE permission.
 
----
+    Runtime access to the microphone without the user’s explicit consent.
 
-## 🚨 1. Permisos Excesivos
+🚨 1. Excessive Permissions
 
-La aplicación solicita una serie de permisos que **no están directamente relacionados con su funcionalidad principal** como app de intercambio de criptomonedas:
+The app requests a number of permissions that are not directly related to its core functionality as a cryptocurrency exchange platform:
 
-- `READ_EXTERNAL_STORAGE`
-- `WRITE_EXTERNAL_STORAGE`
-- `CAMERA`
-- `ACCESS_FINE_LOCATION`
-- `ACCESS_COARSE_LOCATION`
-- `WRITE_SETTINGS`
-- `FOREGROUNDSERVICE_MICROPHONE` (📢 permite grabación continua de audio en segundo plano)
+    READ_EXTERNAL_STORAGE
 
-Estos permisos representan una grave amenaza a la privacidad de los usuarios, abriendo la posibilidad a la recolección masiva de datos sensibles y vigilancia encubierta.
+    WRITE_EXTERNAL_STORAGE
 
----
+    CAMERA
 
-## ⚙️ 2. Permisos Concedidos Durante la Instalación
+    ACCESS_FINE_LOCATION
 
-Durante la instalación, se otorgan automáticamente varios permisos sensibles, sin intervención del usuario:
+    ACCESS_COARSE_LOCATION
 
-```plaintext
+    WRITE_SETTINGS
+
+    FOREGROUNDSERVICE_MICROPHONE (📢 allows continuous background audio recording)
+
+These permissions pose a major privacy threat, potentially enabling mass collection of sensitive data and covert surveillance of users.
+⚙️ 2. Permissions Granted at Installation
+
+Upon installation, several sensitive permissions are granted automatically, with no user interaction required:
+
 android.permission.FOREGROUNDSERVICEMICROPHONE: granted=true
-android.permission.RECORD_AUDIO: granted at runtime (ver sección 3)
+android.permission.RECORD_AUDIO: granted at runtime (see section 3)
 android.permission.INTERNET: granted=true
 android.permission.ACCESS_NETWORK_STATE: granted=true
 android.permission.USE_FINGERPRINT: granted=true
@@ -41,99 +42,94 @@ android.permission.ACCESS_WIFI_STATE: granted=true
 android.permission.RECEIVE_BOOT_COMPLETED: granted=true
 com.google.android.gms.permission.AD_ID: granted=true
 
-El permiso FOREGROUNDSERVICEMICROPHONE es particularmente preocupante porque permite la grabación continua de audio incluso cuando la app está en segundo plano, sin necesidad de interacción adicional por parte del usuario.
+The FOREGROUNDSERVICE_MICROPHONE permission is particularly concerning, as it allows continuous audio recording even while the app is in the background — without requiring any further user action.
+🎙️ 3. RECORD_AUDIO Permission Granted at Runtime
 
-🎙️ 3. Permiso RECORD_AUDIO en Tiempo de Ejecución
-Durante pruebas en un dispositivo Samsung A52, se confirmó que la app tiene habilitado el permiso RECORD_AUDIO, sin mostrar ninguna solicitud al usuario para activarlo:
+During testing on a Samsung A52 device, it was confirmed that the app has RECORD_AUDIO permission enabled, without any prompt asking the user for access:
 
-Dispositivo de prueba: Samsung A52
+    Test Device: Samsung A52
 
-Permiso: android.permission.RECORD_AUDIO: granted=true
+    Permission: android.permission.RECORD_AUDIO: granted=true
 
-Observación: En ningún momento se solicitó acceso al micrófono explícitamente al usuario.
+    Observation: At no point was microphone access explicitly requested from the user.
 
-⚠️ Esto representa una grave violación de la privacidad, y puede estar infringiendo leyes de protección de datos, como el GDPR en Europa.
+⚠️ This represents a severe privacy violation and may breach data protection laws, such as the GDPR in Europe.
+⚖️ Legal Considerations
 
-⚖️ Consideraciones Legales
-La grabación y procesamiento de datos de audio sin consentimiento explícito del usuario puede violar múltiples normativas:
+Recording and processing audio data without explicit user consent may violate multiple regulations:
 
-Reglamento General de Protección de Datos (GDPR) – Unión Europea
+    General Data Protection Regulation (GDPR) – European Union
 
-Leyes nacionales sobre privacidad de las comunicaciones
+    National communication privacy laws
 
-Leyes de consentimiento para grabaciones (dependiendo de la jurisdicción)
+    One- or two-party consent laws for recordings, depending on jurisdiction
 
-Incluso si el propósito fuera marketing, es obligatorio informar y obtener consentimiento claro y específico del usuario.
+Even for purposes like marketing or analytics, clear and specific consent must be obtained and documented.
+🧪 Validation Steps
+🔍 APK Analysis
 
-🧪 Pasos de Validación
-🔍 Análisis del APK
-Descargar el APK:
+    Download APK:
+
 https://apkcombo.app/en/tothemoon-buy-trade-btc/com.cryptology.flutter/download/apk
 
-Descompilar el APK con apktool:
+    Decompile with apktool:
 
-bash
-Copiar
-Editar
 apktool d com.cryptology.flutter.apk -o decrypted_apk
-Revisar AndroidManifest.xml para verificar los permisos solicitados.
 
-📱 Pruebas en Dispositivo
-Instalar la app en un Samsung A52.
+    Review AndroidManifest.xml for requested permissions.
 
-Conectar el dispositivo vía ADB:
+📱 Device Testing
 
-bash
-Copiar
-Editar
+    Install the app on a Samsung A52.
+
+    Connect the device via ADB:
+
 adb devices
 adb shell getprop ro.product.manufacturer
 adb shell getprop ro.product.model
-Verificar permisos otorgados:
 
-bash
-Copiar
-Editar
+    Check granted permissions:
+
 adb shell dumpsys package com.cryptology.flutter | grep permission
-Confirmar que no se solicita acceso al micrófono de forma explícita durante la instalación o ejecución.
 
-💥 Impacto
+    Confirm that no prompt appears requesting microphone access during install or use.
 
-Riesgo	Descripción
-🕵️‍♂️ Violación de Privacidad	Grabación de conversaciones sin consentimiento
-💸 Robo de Datos Financieros	Acceso potencial a información de wallets y cuentas
-🧬 Manipulación de Datos	Modificación de configuraciones sin conocimiento del usuario
-🧠 Recolección de Datos Personales	Uso para marketing o fines no revelados
-⚠️ Compromiso Total del Dispositivo	Uso malicioso de sensores y hardware
-🔎 Clasificación de la Vulnerabilidad (CVSS)
-Gravedad: CRÍTICA
+💥 Impact
+Risk Category	Description
+🕵️ Privacy Violation	Recording conversations without consent
+💸 Financial Data Theft	Potential access to wallet or account information
+🧬 Data Manipulation	Modification of app settings without user knowledge
+🧠 Personal Data Harvesting	Use of sensitive data for marketing or unknown purposes
+⚠️ Full Device Compromise	Malicious use of sensors, microphone, and hardware resources
+🔎 Vulnerability Classification (CVSS v3.1)
+Metric	Value
+Severity	CRITICAL
+Attack Vector	Network
+Attack Complexity	Low
+Privileges Required	None
+User Interaction	None
+Scope	Changed
+Confidentiality Impact	High
+Integrity Impact	High
+Availability Impact	Low
+🛡️ Recommendations
 
-Vector de Ataque: RED
+    Remove unnecessary permissions from the AndroidManifest.xml.
 
-Complejidad del Ataque: BAJA
+    Request sensitive permissions only when strictly needed, and always with clear user consent.
 
-Privilegios Requeridos: NINGUNO
+    Improve transparency in the app’s privacy policy and permission prompts.
 
-Interacción del Usuario: NINGUNA
+    Conduct external security audits and compliance reviews.
 
-Ámbito Afectado: CAMBIADO
+    Ensure full compliance with GDPR and other local data protection and recording laws.
 
-Confidencialidad: ALTA
+📌 Conclusion
 
-Integridad: ALTA
+The com.cryptology.flutter application poses a severe privacy and security risk due to its ability to record audio without user consent. It is strongly recommended that the developers:
 
-Disponibilidad: BAJA
+    Review and refactor the permission usage.
 
-🛡️ Recomendaciones
-Eliminar permisos innecesarios del AndroidManifest.xml.
+    Conduct a comprehensive security and privacy audit.
 
-Solicitar permisos sensibles (como micrófono o ubicación) solo cuando sea estrictamente necesario y con consentimiento explícito.
-
-Implementar transparencia en políticas de privacidad y flujo de consentimiento.
-
-Auditoría externa de seguridad y cumplimiento de privacidad.
-
-Cumplimiento estricto del GDPR y regulaciones locales sobre grabación y tratamiento de datos personales.
-
-📌 Conclusión
-La aplicación com.cryptology.flutter representa un riesgo severo a la privacidad y seguridad del usuario, especialmente por su capacidad de grabar audio sin consentimiento. Se recomienda enfáticamente realizar una revisión exhaustiva del código, ajustar los permisos solicitados, y asegurar cumplimiento con todas las normativas de protección de datos antes de continuar su distribución.
+    Ensure compliance with data protection regulations before continuing app distribution
